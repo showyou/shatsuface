@@ -7,6 +7,7 @@ Original C implementation by:  ?
 Python implementation by: Roman Stanchak
 """
 import sys
+import os
 from opencv.cv import *
 from opencv.highgui import *
 
@@ -42,6 +43,7 @@ def detect_and_draw( img,cascade ):
     cvEqualizeHist( small_img, small_img );
     
     cvClearMemStorage( storage );
+    faceFlag = False
     if( cascade ):
         t = cvGetTickCount();
         faces = cvHaarDetectObjects( small_img, cascade, storage,
@@ -51,11 +53,13 @@ def detect_and_draw( img,cascade ):
         if faces:
             for r in faces:
                 print "detect face!"
+                faceFlag = True
                 pt1 = cvPoint( int(r.x*image_scale), int(r.y*image_scale))
                 pt2 = cvPoint( int((r.x+r.width)*image_scale), int((r.y+r.height)*image_scale) )
                 cvRectangle( img, pt1, pt2, CV_RGB(255,0,0), 3, 8, 0 );
 
     cvShowImage( "result", img );
+    return faceFlag
 
 import re
 import Image
@@ -78,15 +82,23 @@ def miniFaceDetect(fileNames):
     if not cascade:
         print "ERROR: Could not load classifier cascade"
         sys.exit(-1)
-    cvNamedWindow( "result", 1 );
+    #cvNamedWindow( "result", 1 );
 
+    for root,dirs,files in os.walk("./img"):
+        for f in files:
+            os.remove("./img/"+f)
+    result = []
     if SAMPLE:
         fileNames = ['./facedata/face/20090828185252.jpg','./facedata/face/20090915160926.jpg','./facedata/face/20090918165256.jpg','./facedata/face/20090918165734.jpg']
     for fileName in fileNames:
         if SAMPLE:
             input_name = fileName
         else:
-            input_name = getImageUrl2File(fileName)
+            try:  
+                input_name = getImageUrl2File(fileName[1])
+            except IOError:
+                print "ERROR: Can not open Photo:",fileName[1]
+                continue
         capture = cvCreateFileCapture( input_name ); 
         
         if SAMPLE:
@@ -95,11 +107,12 @@ def miniFaceDetect(fileNames):
 		    image = cvLoadImage( "./img/"+input_name, 1 );
         
         if( image ):
-            detect_and_draw( image,cascade );
-            cvWaitKey(0);
+            if detect_and_draw( image, cascade ):
+                result.append(fileName);
+            #cvWaitKey(0);
 
-    cvDestroyWindow("result");
-
+    #cvDestroyWindow("result");
+    return result
 
 
 def main(input_name):
