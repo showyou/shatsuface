@@ -99,7 +99,7 @@ def miniFaceDetect(fileNames):
             except IOError:
                 print "ERROR: Can not open Photo:",fileName[1]
                 continue
-        capture = cvCreateFileCapture( input_name ); 
+        #capture = cvCreateFileCapture( input_name ); 
         
         if SAMPLE:
             image = cvLoadImage(input_name,1);
