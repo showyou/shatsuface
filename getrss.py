@@ -4,8 +4,8 @@ import urllib
 import re
 import facedetect
 
-htmlPath = "."
-#htmlPath = "/home/yuki/public_html"
+#htmlPath = "."
+htmlPath = "/home/yuki/public_html"
 def getRss():
 	f = urllib.urlopen("http://f.hatena.ne.jp/twitter/rss")
 	data = f.read()
@@ -38,7 +38,7 @@ def putOutRSS(result):
 		f.write("<item rdf:about=\"%s\">\n" % r[0])
 		f.write(" <title>%s</title>\n" % r[1])
 		f.write(" <link>%s</link>\n" % r[0])
-		f.write(" <description><img src=\"%s\" /></description>\n" % r[1])
+		f.write(" <description><![CDATA[<a href=\"%s\"><img src=\"%s\" /></a>]]></description>\n" % r)
 		f.write("</item>\n")
 	f.write("</rdf:RDF>\n")	
 	return
